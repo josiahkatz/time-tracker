@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>com.josiah.time-tracker.calendar-helper</string>
+    <key>CFBundleName</key>
+    <string>Time Tracker</string>
+    <key>CFBundleExecutable</key>
+    <string>calendar-helper</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleVersion</key>
+    <string>1.0</string>
+    <key>LSBackgroundOnly</key>
+    <true/>
+    <key>NSCalendarsFullAccessUsageDescription</key>
+    <string>Time Tracker reads your calendar to suggest time entries.</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>Time Tracker reads your calendar to suggest time entries.</string>
+</dict>
+</plist>

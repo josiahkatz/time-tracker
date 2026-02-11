@@ -1,0 +1,56 @@
+{
+  "name": "time-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:electron\"",
+    "dev:renderer": "cd renderer && npx vite --port 5173",
+    "dev:electron": "npm run build:electron && npx wait-on http://localhost:5173 && electron .",
+    "build:electron": "tsc -p tsconfig.json",
+    "build:renderer": "cd renderer && npx vite build",
+    "build:swift": "swiftc electron/calendar-helper.swift -o electron/CalendarHelper.app/Contents/MacOS/calendar-helper -framework EventKit",
+    "build": "npm run build:swift && npm run build:electron && npm run build:renderer",
+    "dist": "npm run build && electron-builder --mac && codesign --force --sign - --entitlements build/entitlements.plist \"release/mac-arm64/Time Tracker.app/Contents/Resources/CalendarHelper.app/Contents/MacOS/calendar-helper\"",
+    "dist:open": "npm run dist && open release/mac-arm64/Time\\ Tracker.app"
+  },
+  "build": {
+    "appId": "com.josiah.time-tracker",
+    "productName": "Time Tracker",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist-electron/**/*",
+      "dist-renderer/**/*",
+      "assets/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "electron/CalendarHelper.app",
+        "to": "CalendarHelper.app"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "assets/icon.icns",
+      "target": "dir",
+      "extendInfo": {
+        "NSCalendarsFullAccessUsageDescription": "Time Tracker reads your calendar to suggest time entries.",
+        "NSCalendarsUsageDescription": "Time Tracker reads your calendar to suggest time entries."
+      }
+    }
+  },
+  "dependencies": {
+    "menubar": "^9.5.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/uuid": "^10.0.0",
+    "concurrently": "^9.1.2",
+    "electron": "~34.2.0",
+    "electron-builder": "^26.7.0",
+    "typescript": "^5.7.0",
+    "wait-on": "^9.0.3"
+  }
+}

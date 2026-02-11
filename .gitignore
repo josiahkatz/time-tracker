@@ -1,0 +1,10 @@
+node_modules/
+dist-electron/
+dist-renderer/
+release/
+renderer/node_modules/
+.DS_Store
+*.log
+.claude/
+electron/CalendarHelper.app/Contents/MacOS/calendar-helper
+electron/calendar-helper
