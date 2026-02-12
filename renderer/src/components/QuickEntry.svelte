@@ -14,6 +14,7 @@
   let duration = $state('');
   let notes = $state('');
   let saving = $state(false);
+  let error = $state('');
 
   $effect(() => {
     if (teams.length > 0 && !team) team = teams[0].name;
@@ -35,8 +36,12 @@
   });
 
   async function submit() {
+    error = '';
     const mins = parseDuration(duration);
-    if (!mins || mins <= 0) return;
+    if (!mins || mins <= 0) {
+      error = 'Enter a valid duration (e.g. 30m, 1h, 1h30m)';
+      return;
+    }
     saving = true;
     try {
       await api.addEntry({
@@ -49,6 +54,9 @@
       duration = '';
       notes = '';
       onEntryAdded();
+    } catch (e) {
+      error = e instanceof Error ? e.message : 'Failed to save entry';
+      console.error('Quick Entry error:', e);
     } finally {
       saving = false;
     }
@@ -56,14 +64,14 @@
 
   function parseDuration(input: string): number {
     const trimmed = input.trim();
-    // "1h 30m" or "1h30m"
-    const hm = trimmed.match(/^(\d+)\s*h\s*(?:(\d+)\s*m?)?$/i);
+    // "1h 30m", "1hr 30min", "1h30m", etc.
+    const hm = trimmed.match(/^(\d+)\s*(?:hrs?|hours?|h)\s*(?:(\d+)\s*(?:mins?|minutes?|m)?)?$/i);
     if (hm) return parseInt(hm[1]) * 60 + (parseInt(hm[2] || '0'));
-    // "90m" or "90"
-    const m = trimmed.match(/^(\d+)\s*m?$/i);
+    // "90m", "90min", "90mins", "90"
+    const m = trimmed.match(/^(\d+)\s*(?:mins?|minutes?|m)?$/i);
     if (m) return parseInt(m[1]);
-    // "1.5h"
-    const dec = trimmed.match(/^(\d+\.?\d*)\s*h$/i);
+    // "1.5h", "1.5hrs"
+    const dec = trimmed.match(/^(\d+\.?\d*)\s*(?:hrs?|hours?|h)$/i);
     if (dec) return Math.round(parseFloat(dec[1]) * 60);
     return 0;
   }
@@ -88,6 +96,7 @@
       type="text"
       placeholder="Duration (e.g. 30m, 1h, 1h30m)"
       bind:value={duration}
+      oninput={() => error = ''}
       onkeydown={(e) => e.key === 'Enter' && submit()}
     />
   </div>
@@ -99,6 +108,9 @@
       onkeydown={(e) => e.key === 'Enter' && submit()}
     />
   </div>
+  {#if error}
+    <p class="error-msg">{error}</p>
+  {/if}
   <button class="btn-submit" onclick={submit} disabled={saving || !duration.trim()}>
     {saving ? 'Saving...' : 'Log Entry'}
   </button>
@@ -131,6 +143,12 @@
   .form-row select, .form-row input {
     flex: 1;
     font-size: 12px;
+  }
+
+  .error-msg {
+    font-size: 11px;
+    color: var(--danger);
+    margin-top: 2px;
   }
 
   .btn-submit {
